@@ -17,6 +17,13 @@
 int mytime = 0x5957;
 
 char textstring[] = "text, more text, and even more text!";
+//from lecture
+#define TRISF  PIC32_R (0x86140)
+#define TRISFCLR  PIC32_R (0x86144)
+#define TRISFSET  PIC32_R (0x86148)
+#define TRISFINv  PIC32_R (0x8614C)
+#define PORTF PIC32_R (0x86150)
+#define PIC32_R(a) * (volatile unsigned*)(0xBF800000 + (a))
 
 /* Interrupt Service Routine */
 void user_isr( void )
@@ -27,6 +34,12 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
+  //From lecture slides
+  //https://www.kth.se/social/files/57e95716f27654773d8ad6c5/lecture5-spp2.pdf
+  TRISE &= ~0xff;
+  TRISF |= 0x2;
+  PORTE = (PORTF >>1) / 0x1;
+
   return;
 }
 
