@@ -27,24 +27,16 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  volatile int * trise = (volatile int *) 0xbf886100;
-  *trise &= ~0xff;
-  //FÖLJANDE KODRAD FÅR DEM ATT LYSA
-  //PORTE = 0xF;
-  PORTD &= ~0x3f0;
   return;
 }
 
 /* This function is called repetitively from the main program */
 void labwork( void )
-{ 
-  volatile int * porte = (volatile int *) 0xbf886110;
+{
   delay( 1000 );
   time2string( textstring, mytime );
   display_string( 3, textstring );
   display_update();
-
   tick( &mytime );
   display_image(96, icon);
-  *porte+= 0x1;
 }
