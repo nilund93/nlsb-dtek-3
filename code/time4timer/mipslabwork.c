@@ -27,6 +27,7 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
+  
   return;
 }
 
