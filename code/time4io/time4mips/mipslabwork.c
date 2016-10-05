@@ -27,16 +27,64 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
+  volatile int * trise = (volatile int *) 0xbf886100;
+  *trise= *trise & 0xff00;
+  PORTD &= ~0xf80f;
+  TRISDSET = (1<<8);
   return;
 }
 
 /* This function is called repetitively from the main program */
 void labwork( void )
-{
+{ 
+  int switches=getsw();
+  int btns=getbtns();
+  int temp;
+
+  if(btns!=0){
+    int choice = btns;
+    choice = choice & 0x1;
+
+    if(choice){
+    temp = mytime & 0xf;
+    mytime= mytime >> 4;
+    mytime = mytime & 0xff0;
+    mytime +=switches;
+    mytime = mytime << 4;
+    mytime +=temp;
+  }
+  
+  btns = btns >> 1;
+  choice = btns ;
+  choice = choice & 0x1;
+  if (choice){
+    temp = mytime & 0xff;
+    mytime = mytime >> 8;
+    mytime = mytime & 0xff0;
+    mytime += switches;
+    mytime = mytime << 8;
+    mytime += temp;
+  }
+  btns = btns >> 1;
+  choice = btns;
+  choice = choice & 0x1;
+  if (choice){
+    temp = mytime & 0xfff;
+    mytime = mytime >> 12;
+    mytime = mytime & 0xff0;
+    mytime += switches;
+    mytime = mytime<<12;
+    mytime += temp;
+
+  }
+}
   delay( 1000 );
   time2string( textstring, mytime );
   display_string( 3, textstring );
   display_update();
   tick( &mytime );
   display_image(96, icon);
+
+  volatile int * porte = (volatile int *) 0xbf886110;
+  *porte+= 0x1;
 }

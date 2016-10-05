@@ -37,44 +37,54 @@ void labinit( void )
 /* This function is called repetitively from the main program */
 void labwork( void )
 { 
-  int switches=getsw();
+  int swi=getsw();
   int btns=getbtns();
-  int temp;
+  //int temp;
 
   if(btns!=0){
     int choice = btns;
-    choice = choice & 0x1;
 
-    if(choice){
+    if(choice & 0x1){
+        mytime = mytime & 0xff0f;
+        swi = swi << 4;
+        mytime = mytime | swi;
+        /*
     temp = mytime & 0xf;
     mytime= mytime >> 4;
     mytime = mytime & 0xff0;
     mytime +=switches;
     mytime = mytime << 4;
     mytime +=temp;
+    */
   }
   
-  btns = btns >> 1;
-  choice = btns ;
-  choice = choice & 0x1;
-  if (choice){
+  //btns = btns >> 1;
+  if (choice & 0x2){
+        mytime = mytime & 0xf0ff;
+        swi = swi << 8;
+        mytime = mytime | swi;
+/*
     temp = mytime & 0xff;
     mytime = mytime >> 8;
     mytime = mytime & 0xff0;
     mytime += switches;
     mytime = mytime << 8;
     mytime += temp;
+    */
   }
-  btns = btns >> 1;
-  choice = btns;
-  choice = choice & 0x1;
-  if (choice){
+  //btns = btns >> 1;
+  if (choice & 0x4){
+    mytime = mytime & 0xfff;
+    swi = swi << 4;
+    mytime = mytime | swi;
+/*
     temp = mytime & 0xfff;
     mytime = mytime >> 12;
     mytime = mytime & 0xff0;
     mytime += switches;
     mytime = mytime<<12;
     mytime += temp;
+    */
 
   }
 }

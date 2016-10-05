@@ -20,64 +20,73 @@
 
 int mytime = 0x5957;
 int timeoutcount=0;
+int prime = 1234567;
 char textstring[] = "text, more text, and even more text!";
 
 /* Interrupt Service Routine */
 void user_isr( void )
 {
-  return;
+  if(IFS(0) & 0x100){
+    IFS(0) = 0;
+    timeoutcount++;
+  }
+  if(timeoutcount == 10){
+    time2string( textstring, mytime );
+    display_string( 3, textstring );
+    display_update();
+    tick( &mytime );
+    timeoutcount = 0;
+
+    volatile int * porte = (volatile int *) 0xbf886110;
+    *porte += 0x1;
+  }
+  int choice=getbtns();
+  if(choice){
+    int swi = getsw();
+    if(choice & 0x1){
+      mytime = mytime & 0xff0f;
+      swi = swi << 4;
+      mytime = mytime | swi;
+    }
+    if(choice & 0x2){
+       mytime = mytime & 0xf0ff;
+       swi = swi << 8;
+       mytime = mytime | swi;
+    }
+    if(choice & 0x4){
+      mytime = mytime & 0xfff;
+      swi = swi << 12;
+      mytime = mytime | swi;
+      }
+    }
+  //time2string( textstring, mytime);
+  //display_string(3, textstring );
+  //display_update();
+  //tick(&mytime);
 }
 
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
+  IEC(0) = 0x100;
+  IPC(2) = 4;
   volatile int * trise = (volatile int *) 0xbf886100;
   *trise = *trise & 0xfff0;
   TRISD = 0xf80f;
   TRISDSET = (0x7f << 5);  
 
-
   T2CON = 0x70;
   PR2 = TMR2PERIOD;
+  TMR2 = 0;
   T2CONSET = 0x8000; /* Start the timer */  
-  return;
+  enable_interrupt();
 }
 
 /* This function is called repetitively from the main program */
 void labwork( void )
 {
-  if(IFS(0) & 0x100){
-    IFS(0) = 0;
-    timeoutcount++;
-    if((timeoutcount % 10) == 0){
-      time2string( textstring, mytime );
-      display_string( 3, textstring );
-      display_update();
-      tick( &mytime );
-      display_image(96, icon);
-      volatile int * porte = (volatile int *) 0xbf886110;
-      *porte += 0x1;
-    }
-    int choice=getbtns();
-    if(choice){
-      int swi = getsw();
-      if(choice & 0x1){
-        mytime = mytime & 0xff0f;
-        swi = swi << 4;
-        mytime = mytime | swi;
-      }
-      if(choice & 0x2){
-        mytime = mytime & 0xf0ff;
-        swi = swi << 8;
-        mytime = mytime | swi;
-      }
-      if(choice & 0x4){
-        mytime = mytime & 0xfff;
-        swi = swi << 12;
-        mytime = mytime | swi;
-      }
-    }
-  }
-  //delay( 1000 );
-  
+  prime = nextprime( prime );
+  display_string(0, itoaconv( prime ) );
+  display_update();
 }
+  //delay( 1000 );
