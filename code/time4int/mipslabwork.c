@@ -27,6 +27,15 @@ char textstring[] = "text, more text, and even more text!";
 /* Interrupt Service Routine */
 void user_isr( void )
 {
+
+  //Surprise Assignment
+  // När SW2 ändrar status - få klockan att ticka 3 sekunder
+  // Ändra init oh user_isr
+  if(IFS(0) & 0x800){
+    tick( &mytime );
+    tick( &mytime );
+    tick( &mytime );  
+  }
   if(IFS(0) & 0x100){
     timeoutcount++;
     IFS(0) = 0;
@@ -41,6 +50,9 @@ void user_isr( void )
     volatile int * porte = (volatile int *) 0xbf886110;
     *porte += 0x1;
   }
+
+  /*
+  DETTA ÄR INTE NÖDVÄNDIGT FÖR DENNA UPPGIFT
   int choice=getbtns();
   if(choice){
     int swi = getsw();
@@ -60,17 +72,24 @@ void user_isr( void )
       mytime = mytime | swi;
       }
     }
+    */
 }
 
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  IEC(0) = 0x0100;
-  IPC(2) = 0x0100;
+  //0x100 initierar endast timern
+  IEC(0) = 0x900; //Enables both timer 2 and External interrupt 2
+  IPC(2) = 4;
+
   volatile int * trise = (volatile int *) 0xbf886100;
   *trise = *trise & 0xfff0;
+  
+
   TRISD = 0xf80f;
   TRISDSET = (0x7f << 5);  
+
+
   T2CON = 0x70;
   PR2 = TMR2PERIOD;
   TMR2 = 0;
