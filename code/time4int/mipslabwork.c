@@ -13,22 +13,24 @@
 #include <stdint.h>   /* Declarations of uint_32 and the like */
 #include <pic32mx.h>  /* Declarations of system-specific addresses etc */
 #include "mipslab.h"  /* Declatations for these labs */
+
 #define TMR2PERIOD ((80000000 / 256) / 10)
 #if TMR2PERIOD > 0xffff
 #error "Timer period is too big."
 #endif
 
-int mytime = 0x5957;
+
 int timeoutcount=0;
 int prime = 1234567;
+int mytime = 0x5957;
 char textstring[] = "text, more text, and even more text!";
 
 /* Interrupt Service Routine */
 void user_isr( void )
 {
   if(IFS(0) & 0x100){
-    IFS(0) = 0;
     timeoutcount++;
+    IFS(0) = 0;
   }
   if(timeoutcount == 10){
     time2string( textstring, mytime );
@@ -37,9 +39,10 @@ void user_isr( void )
     tick( &mytime );
     timeoutcount = 0;
 
-    volatile int * porte = (volatile int *) 0xbf886110;
-    *porte += 0x1;
+    //volatile int * porte = (volatile int *) 0xbf886110;
+    //*porte += 0x1;
   }
+  /*
   int choice=getbtns();
   if(choice){
     int swi = getsw();
@@ -59,10 +62,7 @@ void user_isr( void )
       mytime = mytime | swi;
       }
     }
-  //time2string( textstring, mytime);
-  //display_string(3, textstring );
-  //display_update();
-  //tick(&mytime);
+    */
 }
 
 /* Lab-specific initialization goes here */
@@ -70,11 +70,12 @@ void labinit( void )
 {
   IEC(0) = 0x100;
   IPC(2) = 4;
+  /*
   volatile int * trise = (volatile int *) 0xbf886100;
   *trise = *trise & 0xfff0;
   TRISD = 0xf80f;
   TRISDSET = (0x7f << 5);  
-
+*/
   T2CON = 0x70;
   PR2 = TMR2PERIOD;
   TMR2 = 0;
@@ -86,7 +87,6 @@ void labinit( void )
 void labwork( void )
 {
   prime = nextprime( prime );
-  display_string(0, itoaconv( prime ) );
+  display_string( 0, itoaconv( prime ) );
   display_update();
 }
-  //delay( 1000 );

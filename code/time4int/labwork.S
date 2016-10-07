@@ -15,11 +15,8 @@
   # You can add your own code here
   #
 .global hexasc, delay, time2string, enable_interrupt
+.data
 .text
-enable_interrupt:
-	ei
-	jr	$ra
-	nop
 hexasc:
 	#one register in $a0 with the 4 lsb
 	#will return in $v0 the 7 LSB, all other bits must be 0.
@@ -77,6 +74,8 @@ done:
 time2string:			#Uppgift 3
 	#sb data, imm(destination)
 	PUSH	$ra
+	PUSH	$s0
+	PUSH	$s1
 	move	$s0, $a0	#spara minnesadressen fr�n a0 i s0
 	move	$s1, $a1	#spara timestampen fr�n a1 i s1
 	
@@ -102,7 +101,13 @@ time2string:			#Uppgift 3
 	jal	hexasc
 	nop	
 	sb	$v0, 4($s0)
-	sb	$zero, 5($s0)		
+	sb	$zero, 5($s0)
+	POP	$s1
+	POP	$s0		
 	POP	$ra
+	jr	$ra
+	nop
+enable_interrupt:
+	ei
 	jr	$ra
 	nop
