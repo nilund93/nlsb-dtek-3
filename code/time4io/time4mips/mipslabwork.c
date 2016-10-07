@@ -37,47 +37,26 @@ void labinit( void )
 /* This function is called repetitively from the main program */
 void labwork( void )
 { 
-  int switches=getsw();
-  int btns=getbtns();
-  int temp;
+  int choice=getbtns();
 
-  if(btns!=0){
-    int choice = btns;
-    choice = choice & 0x1;
-
-    if(choice){
-    temp = mytime & 0xf;
-    mytime= mytime >> 4;
-    mytime = mytime & 0xff0;
-    mytime +=switches;
-    mytime = mytime << 4;
-    mytime +=temp;
+  if(choice){
+    int swi = getsw();
+    if(choice & 0x1){
+      mytime = mytime & 0xff0f;
+      swi = swi << 4;
+      mytime = mytime | swi;
+    }
+    if(choice & 0x2){
+      mytime = mytime & 0xf0ff;
+      swi = swi << 8;
+      mytime = mytime | swi;
+    }
+    if(choice & 0x4){
+      mytime = mytime & 0xfff;
+      swi = swi << 12;
+      mytime = mytime | swi;
+    }
   }
-  
-  btns = btns >> 1;
-  choice = btns ;
-  choice = choice & 0x1;
-  if (choice){
-    temp = mytime & 0xff;
-    mytime = mytime >> 8;
-    mytime = mytime & 0xff0;
-    mytime += switches;
-    mytime = mytime << 8;
-    mytime += temp;
-  }
-  btns = btns >> 1;
-  choice = btns;
-  choice = choice & 0x1;
-  if (choice){
-    temp = mytime & 0xfff;
-    mytime = mytime >> 12;
-    mytime = mytime & 0xff0;
-    mytime += switches;
-    mytime = mytime<<12;
-    mytime += temp;
-
-  }
-}
   delay( 1000 );
   time2string( textstring, mytime );
   display_string( 3, textstring );

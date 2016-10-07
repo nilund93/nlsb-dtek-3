@@ -14,7 +14,8 @@
 .endm
   # You can add your own code here
   #
-.global hexasc, delay, time2string  
+.global hexasc, delay, time2string, enable_interrupt
+.data
 .text
 hexasc:
 	#one register in $a0 with the 4 lsb
@@ -73,6 +74,8 @@ done:
 time2string:			#Uppgift 3
 	#sb data, imm(destination)
 	PUSH	$ra
+	PUSH	$s0
+	PUSH	$s1
 	move	$s0, $a0	#spara minnesadressen fr�n a0 i s0
 	move	$s1, $a1	#spara timestampen fr�n a1 i s1
 	
@@ -96,27 +99,15 @@ time2string:			#Uppgift 3
 	
 	move	$a0, $s1	#tar fram sekund ental
 	jal	hexasc
-	nop
-	#brancha om v0 är samma värde som ascii för 9
-	bne	$v0, 0x39, NICHTNEIN
-	nop
-	li	$t1, 0x4E
-	sb	$t1, 4($s0)
-	li	$t1, 0x45
-	sb	$t1, 5($s0)
-	li	$t1, 0x49
-	sb	$t1, 6($s0)
-	li	$t1, 0x4E
-	sb	$t1, 7($s0)
-	
-	sb	$zero, 8($s0)
-	j	GoOn
-	nop
-NICHTNEIN:	
+	nop	
 	sb	$v0, 4($s0)
-	#addi	$t1, $zero, 0x00 #lagra nullbyte
 	sb	$zero, 5($s0)
-GoOn:		
+	POP	$s1
+	POP	$s0		
 	POP	$ra
+	jr	$ra
+	nop
+enable_interrupt:
+	ei
 	jr	$ra
 	nop
