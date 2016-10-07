@@ -65,8 +65,8 @@ void user_isr( void )
 /* Lab-specific initialization goes here */
 void labinit( void )
 {
-  IEC(0) = 0x100;
-  IPC(2) = 4;
+  IEC(0) = 0x0100;
+  IPC(2) = 0x0100;
   volatile int * trise = (volatile int *) 0xbf886100;
   *trise = *trise & 0xfff0;
   TRISD = 0xf80f;

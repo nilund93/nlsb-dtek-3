@@ -30,7 +30,7 @@ void labinit( void )
   volatile int * trise = (volatile int *) 0xbf886100;
   *trise= *trise & 0xff00;
   PORTD &= ~0xf80f;
-  TRISDSET = (1<<8);
+  TRISDSET = 0x100;
   return;
 }
 
